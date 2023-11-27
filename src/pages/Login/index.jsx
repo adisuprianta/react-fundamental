@@ -1,74 +1,114 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import LoginImage from '../../assets/images/login_register.svg';
+import { validateField, validateUsername } from '../../utils/validation';
 
 // eslint-disable-next-line react/prop-types
 export default class Login extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
-      form:{
+      form: {
         username: '',
         password: '',
-    },
-    errors:{
-      username: '',
-      password: '',
-    }
+      },
+      errors: {
+        username: '',
+        password: '',
+      },
+      tauched: {
+        username: false,
+        password: false,
+      },
+      isValid: false,
     };
   }
   handleChange = (e) => {
-        
     const { name, value } = e.target;
-    console.log(name, value);
-    this.setState({
-      ...this.state,
-      form: {
-        ...this.state.form,
-        [name]: value,
+    // console.log(name, value);
+    this.setState(
+      (prevState) => {
+        return {
+          ...prevState,
+          form: {
+            ...prevState.form,
+            [name]: value,
+          },
+          touched: {
+            ...prevState.touced,
+            [name]: true,
+          },
+        };
       },
-    });
+      () => this.validateForm()
+    );
   };
 
-  
-  handleOnSubmit= (e) => {
+  handleBlur = (e) => {
+    const { name } = e.target;
+    console.log(name);
+    this.setState(
+      (prevState) => {
+        return {
+        ...prevState,
+          touched: {
+          ...prevState.touched,
+            [name]: true,
+          },
+        };
+      },
+      () => this.validateForm()
+    );
+  }
+
+  handleOnSubmit = (e) => {
     e.preventDefault();
-    const {username, password} = this.state.form;
-    let isValid =true;
-    let errorThem ={};
-    if(username ===''){
-      isValid = false;
-      
-      errorThem.username = 'username is required';
-    }
-    if(password ===''){
-      isValid = false;
-      errorThem.password = 'password is required';
-    }
-    this.setState({
-      ...this.state,
-      errors: errorThem,
-    });
+    const { username, password } = this.state.form;
+    console.log(username, password);
 
-    
-    if(!isValid) return;
+    // console.log(this.validateForm());
+    // if (this.validateForm()) return;
 
-
-    if(username === 'admin' && password === 'password') {
+    if (username === 'admin' && password === 'password') {
       this.props.handleLogin(false);
     }
 
     // console.log(username, password);
-  }
+  };
 
+  validateForm = () => {
+    const {
+      form: { username, password },
+    } = this.state;
+
+    const errorUsername = validateField(username, 'username is required')
+    const errorPassword = validateField(password, 'password is required');
+    const errorUsernameFormat = validateUsername(username, 'Invalid username');
+
+      console.log(errorUsername, errorPassword)
+    const errorThem = {
+      username: errorUsername || errorUsernameFormat,
+      password: errorPassword,
+    };
+
+    
+    const isValid = !errorThem.username && !errorThem.password;
+
+    this.setState({
+      ...this.state,
+      errors: errorThem,
+      isValid: isValid,
+    });
+
+
+    return isValid;
+  };
 
   render() {
     const {
-      errors: { username: usernameError, password: passwordError},
+      errors: { username: usernameError, password: passwordError },
+      isValid,
     } = this.state;
-    console.log(passwordError);
-    console.log(usernameError);
     return (
       <div className="container-fluid ms-2 py-4">
         <div className="cursor-pointer">
@@ -96,32 +136,48 @@ export default class Login extends React.Component {
                 <input
                   type="username"
                   name="username"
-                  className= {`form-control text-normal border-0 border-bottom rounded-0 outline-none ${usernameError && 'is-invalid'}`}
+                  className={`form-control text-normal border-0 border-bottom rounded-0 outline-none ${
+                    usernameError && 'is-invalid'
+                  }`}
                   id="username"
                   placeholder="Username"
                   onChange={this.handleChange}
+                  onBlur={this.handleBlur}
                 />
-                <div id="validationServerUsernameFeedback" className="invalid-feedback">
-                {usernameError}
-              </div>
+                <div
+                  id="validationServerUsernameFeedback"
+                  className="invalid-feedback"
+                >
+                  {usernameError}
+                </div>
               </div>
               <div className="mb-3 mt-4">
                 <input
                   type="password"
                   name="password"
-                  className={`form-control text-normal border-0 border-bottom rounded-0 outline-none ${passwordError && 'is-invalid'}`}
+                  className={`form-control text-normal border-0 border-bottom rounded-0 outline-none ${
+                    passwordError && 'is-invalid'
+                  }`}
                   id="password"
                   placeholder="Password"
                   onChange={this.handleChange}
+                  onBlur={this.handleBlur}
                 />
-                <div id="validationServerUsernameFeedback" className="invalid-feedback">
-                {passwordError}
+                <div
+                  id="validationServerUsernameFeedback"
+                  className="invalid-feedback"
+                >
+                  {passwordError}
                 </div>
               </div>
               <p className="fw-bold text-primary text-normal cursor-pointer text-end">
                 Lupa Password?
               </p>
-              <button type='submit'  className="btn btn-primary text-normal fw-bold rounded-4 w-100 mt-4">
+              <button
+                type="submit"
+                disabled={!isValid}
+                className="btn btn-primary text-normal fw-bold rounded-4 w-100 mt-4"
+              >
                 Log In
               </button>
             </form>
