@@ -2,7 +2,8 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 
-export default function Sidebar() {
+export default function Sidebar({handlePage, handleLogin}) {
+
   return (
     <div
       className={'p-4 bg-secondary'}
@@ -28,15 +29,15 @@ export default function Sidebar() {
           </li>
           <div className="collapse" id="dashboard-collapse">
             <ul className="text-primary cursor-pointer d-flex flex-column gap-3 btn-toggle-nav list-unstyled mx-4">
-              <li className="cursor-pointer">
+              <li className="cursor-pointer" onClick={()=>handlePage(1)}>
                 <i className="bi bi-house me-3"></i>
                 <span>Home</span>
               </li>
-              <li className="cursor-pointer">
+              <li className="cursor-pointer" onClick={()=>handlePage(3)}>
                 <i className="bi bi-egg-fried me-3"></i>
                 <span>Menu</span>
               </li>
-              <li className="cursor-pointer">
+              <li onClick={()=>handlePage(2)} className="cursor-pointer">
                 <i className="bi bi-view-stacked me-3"></i>
                 <span>Table</span>
               </li>
@@ -56,7 +57,7 @@ export default function Sidebar() {
             <span>User</span>
           </li>
           <hr />
-          <li className="text-primary">
+          <li className="text-primary" onClick = {()=>handleLogin(true)}>
             <i className="bi bi-box-arrow-right me-3"></i>
             <span>Logout</span>
           </li>
